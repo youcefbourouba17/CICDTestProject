@@ -14,15 +14,28 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Match Angular LTS version
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore dependencies
+      - name: Restore .NET dependencies
         run: dotnet restore CICDTestProject/CICDTestProject.csproj
 
-      - name: Build and publish
+      - name: Install Angular dependencies
+        working-directory: CICDTestProject/CICDTestProject/ClientApp
+        run: npm install
+
+      - name: Build Angular project
+        working-directory: CICDTestProject/CICDTestProject/ClientApp
+        run: npm run build -- --configuration production
+
+      - name: Publish .NET project
         run: dotnet publish CICDTestProject/CICDTestProject.csproj -c Release -o ./publish
 
       - name: FTP Deploy

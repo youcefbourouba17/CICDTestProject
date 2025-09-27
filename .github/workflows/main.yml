@@ -1,0 +1,39 @@
+name: Build and Deploy to FTP
+
+on:
+ workflow_dispatch:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20.x'
+
+    - name: Restore Dependencies
+      run: dotnet restore
+
+    - name: Build and Publish
+      run: dotnet publish -c Release -o ./publish
+
+    - name: Deploy via FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }} 
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./publish
+        server-dir: /www.CICDTest.somee.com

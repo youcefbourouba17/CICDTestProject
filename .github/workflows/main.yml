@@ -48,9 +48,10 @@ jobs:
         run: dotnet publish CICDTestProject/CICDTestProject.csproj -c Release -o ./publish
 
       # 8. Copy front-end build into publish folder
-      - name: Copy front-end build to publish folder
+    - name: Copy front-end build to publish/wwwroot
         run: |
-          xcopy CICDTestProject\ClientApp\dist\ClientApp publish\ClientApp /E /I /Y
+          mkdir publish\wwwroot
+          xcopy CICDTestProject\ClientApp\dist\ClientApp publish\wwwroot /E /I /Y
 
       # 9. FTP Deploy everything
       - name: FTP Deploy

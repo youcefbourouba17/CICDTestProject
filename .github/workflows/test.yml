@@ -25,3 +25,4 @@ jobs:
           local-dir: publish/             # upload the CONTENTS of publish (no trailing slash)
           server-dir: 'www.CICDTest.somee.com/'                # <-- fixed: use server path ('.' = home directory)
           protocol: ftp
+          delete-remote-dir: true

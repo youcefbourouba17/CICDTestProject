@@ -54,7 +54,7 @@ jobs:
           server: ${{secrets.FTP_SERVER}}
           username: ${{secrets.FTP_USERNAME}}
           password: ${{secrets.FTP_PASSWORD}}
-          local-dir: D:\a\CICDTestProject\publish\
+          local-dir: D:\a\CICDTestProject\publish/
           server-dir: 'www.CICDTest.somee.com/temp/'  # new folder
           protocol: ftp
 

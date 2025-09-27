@@ -50,6 +50,9 @@ jobs:
       # 8. Copy front-end build into publish/wwwroot
       - name: Copy front-end build to publish/wwwroot
         run: |
+          if (Test-Path publish\wwwroot) {
+              Remove-Item publish\wwwroot -Recurse -Force
+          }
           mkdir publish\wwwroot
           xcopy CICDTestProject\ClientApp\dist\ClientApp publish\wwwroot /E /I /Y
 

@@ -1,0 +1,25 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    steps:
+
+      # 9. FTP Deploy everything
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: CICDTest.somee.com  # Only the domain name
+          username: youcef12
+          password: 06122099@somee
+          local-dir: ./publish/*/
+          remote-dir: /www.CICDTest.somee.com/
+
+          protocol: ftp

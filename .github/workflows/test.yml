@@ -19,9 +19,9 @@ jobs:
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: CICDTest.somee.com      # host (unchanged)
-          username: youcef12             # kept as requested
-          password: 06122099@somee       # kept as requested
+          server: ${{secrets.FTP_SERVER}}
+          username: ${{secrets.FTP_USERNAME}}
+          password: ${{secrets.FTP_PASSWORD}}
           local-dir: publish/             # upload the CONTENTS of publish (no trailing slash)
           server-dir: 'www.CICDTest.somee.com/'                # <-- fixed: use server path ('.' = home directory)
           protocol: ftp

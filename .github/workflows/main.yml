@@ -53,7 +53,7 @@ jobs:
         with:
           server: CICDTest.somee.com  # Only the domain name
           username: youcef12
-          password: ss@somee
+          password: 06122099@somee
           local-dir: ./publish/
           server-dir: /  # Root directory or appropriate subdirectory
           protocol: ftp

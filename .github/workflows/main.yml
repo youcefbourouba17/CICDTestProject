@@ -47,8 +47,8 @@ jobs:
       - name: Build and publish .NET backend
         run: dotnet publish CICDTestProject/CICDTestProject.csproj -c Release -o ./publish
 
-      # 8. Copy front-end build into publish folder
-    - name: Copy front-end build to publish/wwwroot
+      # 8. Copy front-end build into publish/wwwroot
+      - name: Copy front-end build to publish/wwwroot
         run: |
           mkdir publish\wwwroot
           xcopy CICDTestProject\ClientApp\dist\ClientApp publish\wwwroot /E /I /Y

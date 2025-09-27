@@ -47,15 +47,6 @@ jobs:
       - name: Build and publish .NET backend
         run: dotnet publish CICDTestProject/CICDTestProject.csproj -c Release -o ./publish
 
-      # 8. Copy front-end build into publish/wwwroot
-      - name: Copy front-end build to publish/wwwroot
-        run: |
-          if (Test-Path publish\wwwroot) {
-              Remove-Item publish\wwwroot -Recurse -Force
-          }
-          mkdir publish\wwwroot
-          xcopy CICDTestProject\ClientApp\dist\ClientApp publish\wwwroot /E /I /Y
-
       # 9. FTP Deploy everything
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5

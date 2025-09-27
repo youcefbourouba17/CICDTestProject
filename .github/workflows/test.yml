@@ -11,14 +11,18 @@ jobs:
     runs-on: windows-2022
 
     steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       # 9. FTP Deploy everything
-     - name: Deploy via FTP
-       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-       with:
-        server: ${{ secrets.FTP_HOST }}
-        username: ${{ secrets.FTP_USER }}
-        password: ${{ secrets.FTP_PASS }}
-        local-dir: 'CICDTestProject/bin/Release/net7.0/publish'
-        server-dir: '/public_html'
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: CICDTest.somee.com  # Only the domain name
+          username: youcef12
+          password: 06122099@somee
+          local-dir: publish/
+          remote-dir: /www.CICDTest.somee.com/
 
+          protocol: ftp

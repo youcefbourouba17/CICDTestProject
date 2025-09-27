@@ -57,6 +57,7 @@ jobs:
           local-dir: D:\a\CICDTestProject\publish/
           server-dir: 'www.CICDTest.somee.com/temp/'  # new folder
           protocol: ftp
+          delete: true
 
       # 9. Swap temp folder with live folder (rename)
       - name: Swap temp to live

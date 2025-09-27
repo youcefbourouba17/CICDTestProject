@@ -10,62 +10,117 @@ jobs:
   build:
     runs-on: windows-2022
 
+    # Expose secrets/environment for steps
+    env:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
+      FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+      FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+      # Adjust this to your webroot or server folder if different.
+      # Example: if your FTP root already is the site root, keep "/"
+      # If your site files live under a folder like "/wwwroot", set SERVER_DIR to "wwwroot"
+      SERVER_DIR: 'www.CICDTest.somee.com'  
+
     steps:
-      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2. Setup Node.js for front-end
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      # 3. Install front-end dependencies
       - name: Install front-end dependencies
         run: |
           cd CICDTestProject/ClientApp
           npm ci
 
-      # 4. Build Angular front-end
       - name: Build Angular front-end
         run: |
           cd CICDTestProject/ClientApp
           npx ng build --configuration production
 
-      # 5. Setup .NET SDK
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
-      # 6. Restore .NET dependencies
       - name: Restore .NET dependencies
         run: dotnet restore CICDTestProject/CICDTestProject.csproj
 
-      # 7. Build and publish .NET backend
       - name: Build and publish .NET backend
+        # Publish to ./publish in the repo workspace (clean/portable path)
         run: dotnet publish CICDTestProject/CICDTestProject.csproj -c Release -o ./publish
 
-      # 8. Deploy to temporary folder (stop app in effect)
-      - name: FTP Deploy to Temp Folder
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{secrets.FTP_SERVER}}
-          username: ${{secrets.FTP_USERNAME}}
-          password: ${{secrets.FTP_PASSWORD}}
-          local-dir: publish/
-          server-dir: 'www.CICDTest.somee.com/temp/'  # new folder
-          protocol: ftp
+      ##################################################################
+      # 1) Upload app_offline.htm to take the ASP.NET site offline
+      #    (so DLLs can be replaced without "file in use" locks)
+      ##################################################################
+      - name: Upload app_offline.htm (take site offline)
+        shell: pwsh
+        run: |
+          # Prepare remote path based on SERVER_DIR
+          $srv = $env:SERVER_DIR.Trim('/')
+          if ([string]::IsNullOrEmpty($srv)) { $remoteDir = "/" } else { $remoteDir = "/$srv" }
+          $remotePath = "$remoteDir/app_offline.htm"
+          Write-Host "Uploading app_offline to $remotePath on $env:FTP_SERVER"
 
-      # 9. Swap temp folder with live folder (rename)
-      - name: Swap temp to live
+          # Create a temp app_offline.htm locally
+          $localFile = "$env:RUNNER_TEMP\app_offline.htm"
+          "<!doctype html><html><head><meta charset='utf-8'/><title>Maintenance</title></head><body><h1>Maintenance - deploying</h1><p>Back shortly.</p></body></html>" | Out-File -FilePath $localFile -Encoding UTF8
+
+          # Upload via FtpWebRequest
+          $uri = "ftp://$env:FTP_SERVER$remotePath"
+          $req = [System.Net.FtpWebRequest]::Create($uri)
+          $req.Credentials = New-Object System.Net.NetworkCredential($env:FTP_USERNAME, $env:FTP_PASSWORD)
+          $req.Method = [System.Net.WebRequestMethods+Ftp]::UploadFile
+          $req.UseBinary = $true
+          $req.UsePassive = $true
+          $bytes = [System.IO.File]::ReadAllBytes($localFile)
+          $stream = $req.GetRequestStream()
+          $stream.Write($bytes, 0, $bytes.Length)
+          $stream.Close()
+          $resp = $req.GetResponse()
+          $resp.Close()
+
+          Write-Host "app_offline.htm uploaded."
+          # give the server a short moment to unload the site
+          Start-Sleep -Seconds 5
+
+      ##################################################################
+      # 2) Deploy published files to the server via ftp-deploy action
+      ##################################################################
+      - name: FTP Deploy (publish to server)
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{secrets.FTP_SERVER}}
-          username: ${{secrets.FTP_USERNAME}}
-          password: ${{secrets.FTP_PASSWORD}}
-          local-dir: ''
-          server-dir: 'www.CICDTest.somee.com/'
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./publish/
+          server-dir: ${{ env.SERVER_DIR }}/
           protocol: ftp
-          dry-run: true  # Optional first run to check commands
+          retry: 3
+          # dangerous-clean-slate: true   # Commented out: enable only if you truly want to delete all server files.
+
+      ##################################################################
+      # 3) Remove app_offline.htm to bring the site back online
+      ##################################################################
+      - name: Remove app_offline.htm (bring site online)
+        shell: pwsh
+        run: |
+          $srv = $env:SERVER_DIR.Trim('/')
+          if ([string]::IsNullOrEmpty($srv)) { $remoteDir = "/" } else { $remoteDir = "/$srv" }
+          $remotePath = "$remoteDir/app_offline.htm"
+          $uri = "ftp://$env:FTP_SERVER$remotePath"
+          Write-Host "Removing app_offline.htm at $remotePath"
+
+          $req = [System.Net.FtpWebRequest]::Create($uri)
+          $req.Credentials = New-Object System.Net.NetworkCredential($env:FTP_USERNAME, $env:FTP_PASSWORD)
+          $req.Method = [System.Net.WebRequestMethods+Ftp]::DeleteFile
+          $req.UsePassive = $true
+          try {
+            $resp = $req.GetResponse()
+            $resp.Close()
+            Write-Host "app_offline.htm removed."
+          } catch {
+            Write-Warning "Could not delete app_offline.htm (maybe it doesn't exist). Continuing."
+          }

@@ -3,3 +3,7 @@
 ################################################################################
 
 /.vs/CICDTestProject
+ClientApp/node_modules/
+ClientApp/.angular/
+
+/.vs

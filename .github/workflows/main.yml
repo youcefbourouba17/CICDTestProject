@@ -51,9 +51,9 @@ jobs:
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: CICDTest.somee.com/www.CICDTest.somee.com
+          server: CICDTest.somee.com  # Only the domain name
           username: youcef12
-          password: 06122099@somee
+          password: ss@somee
           local-dir: ./publish/
-          server-dir: /www.CICDTest.somee.com/
+          server-dir: /  # Root directory or appropriate subdirectory
           protocol: ftp

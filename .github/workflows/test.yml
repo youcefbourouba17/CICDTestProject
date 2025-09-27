@@ -23,6 +23,6 @@ jobs:
           username: youcef12
           password: 06122099@somee
           local-dir: publish/
-          remote-dir: /www.CICDTest.somee.com
+          remote-dir: www.CICDTest.somee.com
 
           protocol: ftp

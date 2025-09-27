@@ -47,17 +47,7 @@ jobs:
       - name: Build and publish .NET backend
         run: dotnet publish CICDTestProject/CICDTestProject.csproj -c Release -o ../publish
 
-      # 8. Deploy to temporary folder (stop app in effect)
-      - name: FTP Deploy to Temp Folder
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{secrets.FTP_SERVER}}
-          username: ${{secrets.FTP_USERNAME}}
-          password: ${{secrets.FTP_PASSWORD}}
-          local-dir: D:\a\CICDTestProject\publish/
-          server-dir: 'www.CICDTest.somee.com/temp/'  # new folder
-          protocol: ftp
-          dangerous-clean-slate: true
+
 
       # 9. Swap temp folder with live folder (rename)
       - name: Swap temp to live
@@ -66,7 +56,7 @@ jobs:
           server: ${{secrets.FTP_SERVER}}
           username: ${{secrets.FTP_USERNAME}}
           password: ${{secrets.FTP_PASSWORD}}
-          local-dir: ''
+          local-dir: D:\a\CICDTestProject\publish/
           server-dir: 'www.CICDTest.somee.com/'
           protocol: ftp
-          dry-run: true  # Optional first run to check commands
+          dangerous-clean-slate: true

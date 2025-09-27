@@ -45,7 +45,7 @@ jobs:
 
       # 7. Build and publish .NET backend
       - name: Build and publish .NET backend
-        run: dotnet publish CICDTestProject/CICDTestProject.csproj -c Release -o ./publish
+        run: dotnet publish CICDTestProject/CICDTestProject.csproj -c Release -o ../publish
 
       # 8. Deploy to temporary folder (stop app in effect)
       - name: FTP Deploy to Temp Folder

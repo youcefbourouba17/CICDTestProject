@@ -1,0 +1,27 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 9. FTP Deploy everything
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: CICDTest.somee.com      # host (unchanged)
+          username: youcef12             # kept as requested
+          password: 06122099@somee       # kept as requested
+          local-dir: publish/             # upload the CONTENTS of publish (no trailing slash)
+          server-dir: 'www.CICDTest.somee.com/'                # <-- fixed: use server path ('.' = home directory)
+          protocol: ftp

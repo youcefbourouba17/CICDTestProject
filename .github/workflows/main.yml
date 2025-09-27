@@ -11,25 +11,49 @@ jobs:
     runs-on: windows-2022
 
     steps:
+      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2. Setup Node.js for front-end
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # 3. Install front-end dependencies
+      - name: Install front-end dependencies
+        run: |
+          cd CICDTestProject/ClientApp
+          npm ci
+
+      # 4. Build Angular front-end
+      - name: Build Angular front-end
+        run: |
+          cd CICDTestProject/ClientApp
+          npx ng build --configuration production
+
+      # 5. Setup .NET SDK
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
-      - name: Restore dependencies
+      # 6. Restore .NET dependencies
+      - name: Restore .NET dependencies
         run: dotnet restore CICDTestProject/CICDTestProject.csproj
 
-      - name: Build and publish
+      # 7. Build and publish .NET backend
+      - name: Build and publish .NET backend
         run: dotnet publish CICDTestProject/CICDTestProject.csproj -c Release -o ./publish
 
+      # 9. FTP Deploy everything
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./publish/
-          server-dir: /www.CICDTest.somee.com/
+          server: ${{secrets.FTP_SERVER}}
+          username: ${{secrets.FTP_USERNAME}}
+          password: ${{secrets.FTP_PASSWORD}}
+          local-dir: publish/             # upload the CONTENTS of publish (no trailing slash)
+          server-dir: 'www.CICDTest.somee.com/'                # <-- fixed: use server path ('.' = home directory)
+          protocol: ftp

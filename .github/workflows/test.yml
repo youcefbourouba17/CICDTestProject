@@ -13,13 +13,12 @@ jobs:
     steps:
 
       # 9. FTP Deploy everything
-      - name: FTP Deploy
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: CICDTest.somee.com  # Only the domain name
-          username: youcef12
-          password: 06122099@somee
-          local-dir: ./publish/*/
-          remote-dir: /www.CICDTest.somee.com/
+     - name: Deploy via FTP
+       uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+       with:
+        server: ${{ secrets.FTP_HOST }}
+        username: ${{ secrets.FTP_USER }}
+        password: ${{ secrets.FTP_PASS }}
+        local-dir: 'CICDTestProject/bin/Release/net7.0/publish'
+        server-dir: '/public_html'
 
-          protocol: ftp

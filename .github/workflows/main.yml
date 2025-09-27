@@ -11,33 +11,49 @@ jobs:
     runs-on: windows-2022
 
     steps:
+      # 1. Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18' # Match Angular LTS version
-
+      # 2. Setup .NET
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
+      # 3. Restore .NET dependencies
       - name: Restore .NET dependencies
         run: dotnet restore CICDTestProject/CICDTestProject.csproj
 
-      - name: Install Angular dependencies
-        working-directory: CICDTestProject/CICDTestProject/ClientApp
-        run: npm install
-
-      - name: Build Angular project
-        working-directory: CICDTestProject/CICDTestProject/ClientApp
-        run: npm run build -- --configuration production
-
-      - name: Publish .NET project
+      # 4. Build and publish .NET backend
+      - name: Build and publish .NET backend
         run: dotnet publish CICDTestProject/CICDTestProject.csproj -c Release -o ./publish
 
+      # 5. Setup Node.js for front-end
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      # 6. Install front-end dependencies
+      - name: Install front-end dependencies
+        run: |
+          cd CICDTestProject/ClientApp
+          npm install
+
+      # 7. Build front-end
+      - name: Build front-end
+        run: |
+          cd CICDTestProject/ClientApp
+          npm run build
+
+      # 8. Copy front-end build to publish folder
+      - name: Copy front-end build to publish folder
+        run: |
+          # Adjust this if your front-end build output folder is different (React: build, Angular: dist)
+          xcopy CICDTestProject\ClientApp\build publish\ClientApp /E /I /Y
+
+      # 9. FTP deploy everything
       - name: FTP Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:

@@ -54,6 +54,6 @@ jobs:
           server: CICDTest.somee.com  # Only the domain name
           username: youcef12
           password: 06122099@somee
-          local-dir: 	d:\DZHosts\LocalUser\youcef12\www.CICDTest.somee.com/
+          local-dir: 	CICDTestProject/publish/
           server-dir: /  # Root directory or appropriate subdirectory
           protocol: ftp

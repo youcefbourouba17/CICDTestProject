@@ -18,7 +18,7 @@ The project integrates a **frontend SPA** with a backend API.
 
 ### 🔹 Steps to Run Locally  
 
-
+```bash
 # Clone the repo
 git clone https://github.com/youcefbourouba17/CICDTestProject.git
 cd CICDTestProject
@@ -30,7 +30,7 @@ dotnet run
 cd frontend
 npm install
 npm start
-
+```
 
 👉 Once running, the backend serves as the API layer, and the SPA frontend consumes it.
 The SPA configuration allows client-side routing while keeping a clean integration with the backend.
@@ -39,7 +39,7 @@ The SPA configuration allows client-side routing while keeping a clean integrati
 
 The project uses GitHub Actions to build, test, and deploy automatically.
 Every push to the repository triggers the pipeline.
-
+```bash
 📊 CI/CD Flow
 flowchart TB
     subgraph CICD["⚡ CI/CD Pipeline"]
@@ -53,7 +53,7 @@ flowchart TB
         G --> H[Deploy to Environment 🌍]
         H --> I[Notify Success ✅]
     end
-
+```
 🔹 Pipeline Stages
 
 Build → Compiles backend & frontend

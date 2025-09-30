@@ -18,7 +18,7 @@ The project integrates a **frontend SPA** with a backend API.
 
 ### 🔹 Steps to Run Locally  
 
-```bash
+
 # Clone the repo
 git clone https://github.com/youcefbourouba17/CICDTestProject.git
 cd CICDTestProject

@@ -40,7 +40,6 @@ The SPA configuration allows client-side routing while keeping a clean integrati
 The project uses GitHub Actions to build, test, and deploy automatically.
 Every push to the repository triggers the pipeline.
 ```mermaid
-📊 CI/CD Flow
 flowchart TB
     subgraph CICD["⚡ CI/CD Pipeline"]
         direction TB
@@ -53,6 +52,7 @@ flowchart TB
         G --> H[Deploy to Environment 🌍]
         H --> I[Notify Success ✅]
     end
+
 ```
 🔹 Pipeline Stages
 
